@@ -6,8 +6,15 @@
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
     <CoreCompileDependsOn>$(CoreCompileDependsOn);Protobuf_Compile</CoreCompileDependsOn>
-    <!--<DebugType>None</DebugType>
-    <DebugSymbols>false</DebugSymbols>-->
+    <DebugType>None</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageId>HavenoSharp</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Atsamd21</Authors>
+    <Description>Library for Haveno daemon</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryUrl>https://github.com/atsamd21/HavenoSharp</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
