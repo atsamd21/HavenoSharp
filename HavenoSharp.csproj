@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>preview</LangVersion>
+    <CoreCompileDependsOn>$(CoreCompileDependsOn);Protobuf_Compile</CoreCompileDependsOn>
+    <!--<DebugType>None</DebugType>
+    <DebugSymbols>false</DebugSymbols>-->
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Protobuf" Version="3.31.0" />
+    <PackageReference Include="Grpc.Net.Client" Version="2.71.0" />
+    <PackageReference Include="Grpc.Net.Client.Web" Version="2.71.0" />
+    <PackageReference Include="Grpc.Tools" Version="2.72.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Mapster" Version="7.4.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.5" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf ProtoRoot="Protos" Include="Protos\grpc.proto" GrpcServices="Client" />
+    <Protobuf ProtoRoot="Protos" Include="Protos\pb.proto" GrpcServices="Client" />
+  </ItemGroup>
+
+</Project>
