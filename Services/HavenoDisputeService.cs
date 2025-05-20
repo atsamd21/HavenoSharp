@@ -1,4 +1,5 @@
 ﻿using Haveno.Proto.Grpc;
+using HavenoSharp.Singletons;
 using Mapster;
 using static Haveno.Proto.Grpc.Disputes;
 

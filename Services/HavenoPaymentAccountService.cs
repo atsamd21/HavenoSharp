@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using Haveno.Proto.Grpc;
 using HavenoSharp.Extensions;
+using HavenoSharp.Singletons;
 using Mapster;
 using static Haveno.Proto.Grpc.PaymentAccounts;
 

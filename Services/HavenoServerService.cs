@@ -1,4 +1,5 @@
 ﻿using Haveno.Proto.Grpc;
+using HavenoSharp.Singletons;
 using static Haveno.Proto.Grpc.ShutdownServer;
 
 namespace HavenoSharp.Services;

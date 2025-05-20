@@ -1,6 +1,7 @@
 ﻿using Google.Protobuf;
 using Grpc.Core;
 using Haveno.Proto.Grpc;
+using HavenoSharp.Singletons;
 using static Haveno.Proto.Grpc.Account;
 
 namespace HavenoSharp.Services;

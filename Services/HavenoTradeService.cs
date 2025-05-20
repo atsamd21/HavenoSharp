@@ -1,5 +1,6 @@
 ﻿using Haveno.Proto.Grpc;
 using HavenoSharp.Models.Responses;
+using HavenoSharp.Singletons;
 using Mapster;
 using static Haveno.Proto.Grpc.Trades;
 

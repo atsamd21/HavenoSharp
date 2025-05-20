@@ -3,7 +3,7 @@ using Haveno.Proto.Grpc;
 using Mapster;
 using static Haveno.Proto.Grpc.Notifications;
 
-namespace HavenoSharp.Services;
+namespace HavenoSharp.Singletons;
 
 public sealed class HavenoNotificationSingleton
 {

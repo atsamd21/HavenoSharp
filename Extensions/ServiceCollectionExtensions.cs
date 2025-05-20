@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
         TypeAdapterConfig<Models.TraditionalCurrency, Protobuf.TraditionalCurrency>.NewConfig()
             .MapWith(src => new Protobuf.TraditionalCurrency());
 
-        services.TryAddSingleton<GrpcSettingsSingleton>();
+        services.TryAddSingleton<GrpcChannelSingleton>();
         services.TryAddSingleton<HavenoNotificationSingleton>();
 
         services.TryAddScoped<IHavenoWalletService, HavenoWalletService>();
