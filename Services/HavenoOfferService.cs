@@ -15,12 +15,12 @@ public interface IHavenoOfferService
     Task<List<Models.OfferInfo>> GetOffersAsync(string currencyCode, string direction);
 }
 
-public sealed class HavenoOfferService : IHavenoOfferService, IDisposable
+public sealed class HavenoOfferService : IHavenoOfferService
 {
     private readonly OffersClient _offersClient;
-    private readonly IGrpcChannelService _grpcChannelService;
+    private readonly GrpcChannelSingleton _grpcChannelService;
 
-    public HavenoOfferService(IGrpcChannelService grpcChannelService)
+    public HavenoOfferService(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
         _offersClient = new(_grpcChannelService.Channel);
@@ -59,10 +59,5 @@ public sealed class HavenoOfferService : IHavenoOfferService, IDisposable
     {
         var response = await _offersClient.GetOffersAsync(new GetOffersRequest { CurrencyCode = currencyCode, Direction = direction });
         return response.Offers.Adapt<List<Models.OfferInfo>>();
-    }
-
-    public void Dispose()
-    {
-        _grpcChannelService.Dispose();
     }
 }

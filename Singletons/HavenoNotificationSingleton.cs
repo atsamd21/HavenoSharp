@@ -7,7 +7,7 @@ namespace HavenoSharp.Singletons;
 
 public sealed class HavenoNotificationSingleton
 {
-    private readonly IGrpcChannelService _grpcChannelService;
+    private readonly GrpcChannelSingleton _grpcChannelService;
 
     private readonly SemaphoreSlim _semaphore = new(1, 1);
 
@@ -20,7 +20,7 @@ public sealed class HavenoNotificationSingleton
 
     public event Action<Models.NotificationMessage>? NotificationMessageReceived;
 
-    public HavenoNotificationSingleton(IGrpcChannelService grpcChannelService)
+    public HavenoNotificationSingleton(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
         _notificationsClient = new(_grpcChannelService.Channel);
@@ -53,7 +53,7 @@ public sealed class HavenoNotificationSingleton
                 _notificationHandlerTask = null;
                 return;
             }
-            catch (RpcException e)
+            catch (RpcException)
             {
 
             }
@@ -61,7 +61,7 @@ public sealed class HavenoNotificationSingleton
             {
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }

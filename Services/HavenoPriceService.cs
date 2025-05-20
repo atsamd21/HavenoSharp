@@ -12,12 +12,12 @@ public interface IHavenoPriceService
     Task<List<Models.MarketPriceInfo>> GetMarketPricesAsync();
 }
 
-public sealed class HavenoPriceService : IHavenoPriceService, IDisposable
+public sealed class HavenoPriceService : IHavenoPriceService
 {
     private readonly PriceClient _priceClient;
-    private readonly IGrpcChannelService _grpcChannelService;
+    private readonly GrpcChannelSingleton _grpcChannelService;
 
-    public HavenoPriceService(IGrpcChannelService grpcChannelService)
+    public HavenoPriceService(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
         _priceClient = new(_grpcChannelService.Channel);
@@ -39,10 +39,5 @@ public sealed class HavenoPriceService : IHavenoPriceService, IDisposable
     {
         var response = await _priceClient.GetMarketPricesAsync(new MarketPricesRequest());
         return response.MarketPrice.Adapt<List<Models.MarketPriceInfo>>();
-    }
-
-    public void Dispose()
-    {
-        _grpcChannelService.Dispose();
     }
 }

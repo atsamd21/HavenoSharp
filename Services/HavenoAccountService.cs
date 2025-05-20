@@ -12,12 +12,12 @@ public interface IHavenoAccountService
     Task RestoreAccountAsync(Stream zipStream);
 }
 
-public sealed class HavenoAccountService : IHavenoAccountService, IDisposable
+public sealed class HavenoAccountService : IHavenoAccountService
 {
     private readonly AccountClient _accountClient;
-    private readonly IGrpcChannelService _grpcChannelService;
+    private readonly GrpcChannelSingleton _grpcChannelService;
 
-    public HavenoAccountService(IGrpcChannelService grpcChannelService)
+    public HavenoAccountService(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
         _accountClient = new(_grpcChannelService.Channel);
@@ -47,10 +47,5 @@ public sealed class HavenoAccountService : IHavenoAccountService, IDisposable
             ZipBytes = zipBytes, 
             TotalLength = (ulong)zipBytes.Length 
         });
-    }
-
-    public void Dispose()
-    {
-        _grpcChannelService.Dispose();
     }
 }

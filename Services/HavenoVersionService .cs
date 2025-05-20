@@ -9,12 +9,12 @@ public interface IHavenoVersionService
     Task<string> GetVersionAsync();
 }
 
-public sealed class HavenoVersionService : IHavenoVersionService, IDisposable
+public sealed class HavenoVersionService : IHavenoVersionService
 {
     private readonly GetVersionClient _getVersionClient;
-    private readonly IGrpcChannelService _grpcChannelService;
+    private readonly GrpcChannelSingleton _grpcChannelService;
 
-    public HavenoVersionService(IGrpcChannelService grpcChannelService)
+    public HavenoVersionService(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
         _getVersionClient = new(_grpcChannelService.Channel);
@@ -24,10 +24,5 @@ public sealed class HavenoVersionService : IHavenoVersionService, IDisposable
     {
         var response = await _getVersionClient.GetVersionAsync(new GetVersionRequest());
         return response.Version;
-    }
-
-    public void Dispose()
-    {
-        _grpcChannelService.Dispose();
     }
 }

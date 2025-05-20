@@ -9,12 +9,12 @@ public interface IHavenoXmrNodeService
     Task<bool> IsXmrNodeOnlineAsync();
 }
 
-public sealed class HavenoXmrNodeService : IHavenoXmrNodeService, IDisposable
+public sealed class HavenoXmrNodeService : IHavenoXmrNodeService
 {
     private readonly XmrNodeClient _xmrNodeClient;
-    private readonly IGrpcChannelService _grpcChannelService;
+    private readonly GrpcChannelSingleton _grpcChannelService;
 
-    public HavenoXmrNodeService(IGrpcChannelService grpcChannelService)
+    public HavenoXmrNodeService(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
         _xmrNodeClient = new(_grpcChannelService.Channel);
@@ -24,10 +24,5 @@ public sealed class HavenoXmrNodeService : IHavenoXmrNodeService, IDisposable
     {
         var response = await _xmrNodeClient.IsXmrNodeOnlineAsync(new IsXmrNodeOnlineRequest());
         return response.IsRunning;
-    }
-
-    public void Dispose()
-    {
-        _grpcChannelService.Dispose();
     }
 }

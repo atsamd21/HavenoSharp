@@ -1,14 +1,9 @@
 ﻿using Grpc.Net.Client;
-using Grpc.Net.Client.Web;
 
 namespace HavenoSharp.Singletons;
 
-public interface IGrpcChannelService : IDisposable
-{
-    GrpcChannel Channel { get; }
-}
 
-public sealed class GrpcChannelSingleton : IGrpcChannelService
+public sealed class GrpcChannelSingleton
 {
     private string _password = string.Empty;
     private string _host = string.Empty;
@@ -42,10 +37,5 @@ public sealed class GrpcChannelSingleton : IGrpcChannelService
         };
 
         Channel = GrpcChannel.ForAddress(host, channelOptions);
-    }
-
-    public void Dispose()
-    {
-        Channel.Dispose();
     }
 }

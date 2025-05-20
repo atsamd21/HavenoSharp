@@ -16,12 +16,12 @@ public interface IHavenoWalletService
     Task<List<Models.XmrTx>> GetXmrTxsAsync();
 }
 
-public sealed class HavenoWalletService : IHavenoWalletService, IDisposable
+public sealed class HavenoWalletService : IHavenoWalletService
 {
     private readonly WalletsClient _walletClient;
-    private readonly IGrpcChannelService _grpcChannelService;
+    private readonly GrpcChannelSingleton _grpcChannelService;
 
-    public HavenoWalletService(IGrpcChannelService grpcChannelService)
+    public HavenoWalletService(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
         _walletClient = new(_grpcChannelService.Channel);
@@ -100,10 +100,5 @@ public sealed class HavenoWalletService : IHavenoWalletService, IDisposable
                 }).ToList()
             }
         };
-    }
-
-    public void Dispose()
-    {
-        _grpcChannelService.Dispose();
     }
 }

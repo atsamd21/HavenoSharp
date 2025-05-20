@@ -9,12 +9,12 @@ public interface IHavenoServerService
     Task IsXmrNodeOnlineAsync();
 }
 
-public sealed class HavenoServerService : IHavenoServerService, IDisposable
+public sealed class HavenoServerService : IHavenoServerService
 {
     private readonly ShutdownServerClient _shutdownServerClient;
-    private readonly IGrpcChannelService _grpcChannelService;
+    private readonly GrpcChannelSingleton _grpcChannelService;
 
-    public HavenoServerService(IGrpcChannelService grpcChannelService)
+    public HavenoServerService(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
         _shutdownServerClient = new(_grpcChannelService.Channel);
@@ -23,10 +23,5 @@ public sealed class HavenoServerService : IHavenoServerService, IDisposable
     public async Task IsXmrNodeOnlineAsync()
     {
         await _shutdownServerClient.StopAsync(new StopRequest());
-    }
-
-    public void Dispose()
-    {
-        _grpcChannelService.Dispose();
     }
 }

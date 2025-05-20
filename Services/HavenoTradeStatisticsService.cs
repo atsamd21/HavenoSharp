@@ -10,12 +10,12 @@ public interface IHavenoTradeStatisticsService
     Task<List<Models.TradeStatistics>> GetTradeStatisticsAsync();
 }
 
-public sealed class HavenoTradeStatisticsService : IHavenoTradeStatisticsService, IDisposable
+public sealed class HavenoTradeStatisticsService : IHavenoTradeStatisticsService
 {
     private readonly GetTradeStatisticsClient _getTradeStatisticsClient;
-    private readonly IGrpcChannelService _grpcChannelService;
+    private readonly GrpcChannelSingleton _grpcChannelService;
 
-    public HavenoTradeStatisticsService(IGrpcChannelService grpcChannelService)
+    public HavenoTradeStatisticsService(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
         _getTradeStatisticsClient = new(_grpcChannelService.Channel);
@@ -25,10 +25,5 @@ public sealed class HavenoTradeStatisticsService : IHavenoTradeStatisticsService
     {
         var response = await _getTradeStatisticsClient.GetTradeStatisticsAsync(new GetTradeStatisticsRequest());
         return response.TradeStatistics.Adapt<List<Models.TradeStatistics>>();
-    }
-
-    public void Dispose()
-    {
-        _grpcChannelService.Dispose();
     }
 }

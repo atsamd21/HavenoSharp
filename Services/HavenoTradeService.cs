@@ -18,12 +18,12 @@ public interface IHavenoTradeService
     Task ConfirmPaymentSentAsync(string tradeId);
 }
 
-public sealed class HavenoTradeService : IHavenoTradeService, IDisposable
+public sealed class HavenoTradeService : IHavenoTradeService
 {
     private readonly TradesClient _accountClient;
-    private readonly IGrpcChannelService _grpcChannelService;
+    private readonly GrpcChannelSingleton _grpcChannelService;
 
-    public HavenoTradeService(IGrpcChannelService grpcChannelService)
+    public HavenoTradeService(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
         _accountClient = new(_grpcChannelService.Channel);
@@ -78,10 +78,5 @@ public sealed class HavenoTradeService : IHavenoTradeService, IDisposable
     public async Task ConfirmPaymentSentAsync(string tradeId)
     {
        await _accountClient.ConfirmPaymentSentAsync(new ConfirmPaymentSentRequest { TradeId = tradeId });
-    }
-
-    public void Dispose()
-    {
-        _grpcChannelService.Dispose();
     }
 }

@@ -19,12 +19,12 @@ public interface IHavenoPaymentAccountService
     Task<string> ValidateFormFieldAsync(Models.Requests.ValidateFormFieldRequest validateFormFieldRequest);
 }
 
-public sealed class HavenoPaymentAccountService : IHavenoPaymentAccountService, IDisposable
+public sealed class HavenoPaymentAccountService : IHavenoPaymentAccountService
 {
     private readonly PaymentAccountsClient _paymentAccountsClient;
-    private readonly IGrpcChannelService _grpcChannelService;
+    private readonly GrpcChannelSingleton _grpcChannelService;
 
-    public HavenoPaymentAccountService(IGrpcChannelService grpcChannelService)
+    public HavenoPaymentAccountService(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
         _paymentAccountsClient = new(_grpcChannelService.Channel);
@@ -98,10 +98,5 @@ public sealed class HavenoPaymentAccountService : IHavenoPaymentAccountService, 
         {
             return e.GetErrorMessage();
         }
-    }
-
-    public void Dispose()
-    {
-        _grpcChannelService.Dispose();
     }
 }

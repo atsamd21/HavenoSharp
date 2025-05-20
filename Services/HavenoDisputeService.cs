@@ -13,12 +13,12 @@ public interface IHavenoDisputeService
     Task SendDisputeChatMessageAsync(Models.Requests.SendDisputeChatMessageRequest request);
 }
 
-public sealed class HavenoDisputeService : IHavenoDisputeService, IDisposable
+public sealed class HavenoDisputeService : IHavenoDisputeService
 {
     private readonly DisputesClient _disputesClient;
-    private readonly IGrpcChannelService _grpcChannelService;
+    private readonly GrpcChannelSingleton _grpcChannelService;
 
-    public HavenoDisputeService(IGrpcChannelService grpcChannelService)
+    public HavenoDisputeService(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
         _disputesClient = new(_grpcChannelService.Channel);
@@ -44,10 +44,5 @@ public sealed class HavenoDisputeService : IHavenoDisputeService, IDisposable
     public async Task SendDisputeChatMessageAsync(Models.Requests.SendDisputeChatMessageRequest request)
     {
         await _disputesClient.SendDisputeChatMessageAsync(request.Adapt<SendDisputeChatMessageRequest>());
-    }
-
-    public void Dispose()
-    {
-        _grpcChannelService.Dispose();
     }
 }
