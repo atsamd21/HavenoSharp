@@ -7,42 +7,41 @@ namespace HavenoSharp.Services;
 
 public interface IHavenoDisputeService
 {
-    Task<List<Models.Dispute>> GetDisputesAsync();
-    Task<Models.Dispute> GetDisputeAsync(string tradeId);
-    Task OpenDisputeAsync(string tradeId);
-    Task SendDisputeChatMessageAsync(Models.Requests.SendDisputeChatMessageRequest request);
+    Task<List<Models.Dispute>> GetDisputesAsync(CancellationToken cancellationToken = default);
+    Task<Models.Dispute> GetDisputeAsync(string tradeId, CancellationToken cancellationToken = default);
+    Task OpenDisputeAsync(string tradeId, CancellationToken cancellationToken = default);
+    Task SendDisputeChatMessageAsync(Models.Requests.SendDisputeChatMessageRequest request, CancellationToken cancellationToken = default);
 }
 
 public sealed class HavenoDisputeService : IHavenoDisputeService
 {
-    private readonly DisputesClient _disputesClient;
     private readonly GrpcChannelSingleton _grpcChannelService;
+    private DisputesClient DisputesClient => new(_grpcChannelService.Channel);
 
     public HavenoDisputeService(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
-        _disputesClient = new(_grpcChannelService.Channel);
     }
 
-    public async Task<List<Models.Dispute>> GetDisputesAsync()
+    public async Task<List<Models.Dispute>> GetDisputesAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _disputesClient.GetDisputesAsync(new GetDisputesRequest());
+        var response = await DisputesClient.GetDisputesAsync(new GetDisputesRequest(), cancellationToken: cancellationToken);
         return response.Disputes.Adapt<List<Models.Dispute>>();
     }
 
-    public async Task<Models.Dispute> GetDisputeAsync(string tradeId)
+    public async Task<Models.Dispute> GetDisputeAsync(string tradeId, CancellationToken cancellationToken = default)
     {
-        var response = await _disputesClient.GetDisputeAsync(new GetDisputeRequest { TradeId = tradeId });
+        var response = await DisputesClient.GetDisputeAsync(new GetDisputeRequest { TradeId = tradeId }, cancellationToken: cancellationToken);
         return response.Dispute.Adapt<Models.Dispute>();
     }
 
-    public async Task OpenDisputeAsync(string tradeId)
+    public async Task OpenDisputeAsync(string tradeId, CancellationToken cancellationToken = default)
     {
-        await _disputesClient.OpenDisputeAsync(new OpenDisputeRequest { TradeId = tradeId });
+        await DisputesClient.OpenDisputeAsync(new OpenDisputeRequest { TradeId = tradeId }, cancellationToken: cancellationToken);
     }
 
-    public async Task SendDisputeChatMessageAsync(Models.Requests.SendDisputeChatMessageRequest request)
+    public async Task SendDisputeChatMessageAsync(Models.Requests.SendDisputeChatMessageRequest request, CancellationToken cancellationToken = default)
     {
-        await _disputesClient.SendDisputeChatMessageAsync(request.Adapt<SendDisputeChatMessageRequest>());
+        await DisputesClient.SendDisputeChatMessageAsync(request.Adapt<SendDisputeChatMessageRequest>(), cancellationToken: cancellationToken);
     }
 }

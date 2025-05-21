@@ -7,37 +7,36 @@ namespace HavenoSharp.Services;
 
 public interface IHavenoPriceService
 {
-    Task<Models.MarketDepthInfo> GetMarketPriceAsync(Models.Requests.MarketDepthRequest marketDepthRequest);
-    Task<double> GetMarketPriceAsync(Models.Requests.MarketPriceRequest marketPriceRequest);
-    Task<List<Models.MarketPriceInfo>> GetMarketPricesAsync();
+    Task<Models.MarketDepthInfo> GetMarketPriceAsync(Models.Requests.MarketDepthRequest marketDepthRequest, CancellationToken cancellationToken = default);
+    Task<double> GetMarketPriceAsync(Models.Requests.MarketPriceRequest marketPriceRequest, CancellationToken cancellationToken = default);
+    Task<List<Models.MarketPriceInfo>> GetMarketPricesAsync(CancellationToken cancellationToken = default);
 }
 
 public sealed class HavenoPriceService : IHavenoPriceService
 {
-    private readonly PriceClient _priceClient;
     private readonly GrpcChannelSingleton _grpcChannelService;
+    private PriceClient PriceClient => new(_grpcChannelService.Channel);
 
     public HavenoPriceService(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
-        _priceClient = new(_grpcChannelService.Channel);
     }
 
-    public async Task<Models.MarketDepthInfo> GetMarketPriceAsync(Models.Requests.MarketDepthRequest marketDepthRequest)
+    public async Task<Models.MarketDepthInfo> GetMarketPriceAsync(Models.Requests.MarketDepthRequest marketDepthRequest, CancellationToken cancellationToken = default)
     {
-        var response = await _priceClient.GetMarketDepthAsync(marketDepthRequest.Adapt<MarketDepthRequest>());
+        var response = await PriceClient.GetMarketDepthAsync(marketDepthRequest.Adapt<MarketDepthRequest>(), cancellationToken: cancellationToken);
         return response.MarketDepth.Adapt<Models.MarketDepthInfo>();
     }
 
-    public async Task<double> GetMarketPriceAsync(Models.Requests.MarketPriceRequest marketPriceRequest)
+    public async Task<double> GetMarketPriceAsync(Models.Requests.MarketPriceRequest marketPriceRequest, CancellationToken cancellationToken = default)
     {
-        var response = await _priceClient.GetMarketPriceAsync(marketPriceRequest.Adapt<MarketPriceRequest>());
+        var response = await PriceClient.GetMarketPriceAsync(marketPriceRequest.Adapt<MarketPriceRequest>(), cancellationToken: cancellationToken);
         return  response.Price;
     }
 
-    public async Task<List<Models.MarketPriceInfo>> GetMarketPricesAsync()
+    public async Task<List<Models.MarketPriceInfo>> GetMarketPricesAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _priceClient.GetMarketPricesAsync(new MarketPricesRequest());
+        var response = await PriceClient.GetMarketPricesAsync(new MarketPricesRequest(), cancellationToken: cancellationToken);
         return response.MarketPrice.Adapt<List<Models.MarketPriceInfo>>();
     }
 }

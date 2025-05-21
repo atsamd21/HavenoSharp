@@ -8,24 +8,23 @@ namespace HavenoSharp.Services;
 
 public interface IHavenoAccountService
 {
-    Task<Stream> BackupAccountAsync();
-    Task RestoreAccountAsync(Stream zipStream);
+    Task<Stream> BackupAccountAsync(CancellationToken cancellationToken = default);
+    Task RestoreAccountAsync(Stream zipStream, CancellationToken cancellationToken = default);
 }
 
 public sealed class HavenoAccountService : IHavenoAccountService
 {
-    private readonly AccountClient _accountClient;
     private readonly GrpcChannelSingleton _grpcChannelService;
+    private AccountClient AccountClient => new(_grpcChannelService.Channel);
 
     public HavenoAccountService(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
-        _accountClient = new(_grpcChannelService.Channel);
     }
 
-    public async Task<Stream> BackupAccountAsync()
+    public async Task<Stream> BackupAccountAsync(CancellationToken cancellationToken = default)
     {
-        using var backupStreamingCall = _accountClient.BackupAccount(new BackupAccountRequest());
+        using var backupStreamingCall = AccountClient.BackupAccount(new BackupAccountRequest(), cancellationToken: cancellationToken);
         var memoryStream = new MemoryStream();
 
         while (await backupStreamingCall.ResponseStream.MoveNext())
@@ -36,11 +35,11 @@ public sealed class HavenoAccountService : IHavenoAccountService
         return memoryStream;
     }
 
-    public async Task RestoreAccountAsync(Stream zipStream)
+    public async Task RestoreAccountAsync(Stream zipStream, CancellationToken cancellationToken = default)
     {
-        var zipBytes = await ByteString.FromStreamAsync(zipStream);
+        var zipBytes = await ByteString.FromStreamAsync(zipStream, cancellationToken: cancellationToken);
 
-        await _accountClient.RestoreAccountAsync(new RestoreAccountRequest 
+        await AccountClient.RestoreAccountAsync(new RestoreAccountRequest 
         { 
             Offset = 0, 
             HasMore = false, 

@@ -7,57 +7,56 @@ namespace HavenoSharp.Services;
 
 public interface IHavenoOfferService
 {
-    Task<Models.OfferInfo> PostOfferAsync(Models.Requests.PostOfferRequest postOfferRequest);
-    Task<Models.OfferInfo> GetMyOfferAsync(string offerId);
-    Task<List<Models.OfferInfo>> GetMyOffersAsync(string currencyCode, string direction);
-    Task CancelOfferAsync(string offerId);
-    Task<Models.OfferInfo> GetOfferAsync(string offerId);
-    Task<List<Models.OfferInfo>> GetOffersAsync(string currencyCode, string direction);
+    Task<Models.OfferInfo> PostOfferAsync(Models.Requests.PostOfferRequest postOfferRequest, CancellationToken cancellationToken = default);
+    Task<Models.OfferInfo> GetMyOfferAsync(string offerId, CancellationToken cancellationToken = default);
+    Task<List<Models.OfferInfo>> GetMyOffersAsync(string currencyCode, string direction, CancellationToken cancellationToken = default);
+    Task CancelOfferAsync(string offerId, CancellationToken cancellationToken = default);
+    Task<Models.OfferInfo> GetOfferAsync(string offerId, CancellationToken cancellationToken = default);
+    Task<List<Models.OfferInfo>> GetOffersAsync(string currencyCode, string direction, CancellationToken cancellationToken = default);
 }
 
 public sealed class HavenoOfferService : IHavenoOfferService
 {
-    private readonly OffersClient _offersClient;
     private readonly GrpcChannelSingleton _grpcChannelService;
+    private OffersClient OffersClient => new(_grpcChannelService.Channel);
 
     public HavenoOfferService(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
-        _offersClient = new(_grpcChannelService.Channel);
     }
 
-    public async Task<Models.OfferInfo> PostOfferAsync(Models.Requests.PostOfferRequest postOfferRequest)
+    public async Task<Models.OfferInfo> PostOfferAsync(Models.Requests.PostOfferRequest postOfferRequest, CancellationToken cancellationToken = default)
     {
-        var response = await _offersClient.PostOfferAsync(postOfferRequest.Adapt<PostOfferRequest>());
+        var response = await OffersClient.PostOfferAsync(postOfferRequest.Adapt<PostOfferRequest>(), cancellationToken: cancellationToken);
         return response.Offer.Adapt<Models.OfferInfo>();
     }
 
-    public async Task<Models.OfferInfo> GetMyOfferAsync(string offerId)
+    public async Task<Models.OfferInfo> GetMyOfferAsync(string offerId, CancellationToken cancellationToken = default)
     {
-        var response = await _offersClient.GetMyOfferAsync(new GetMyOfferRequest { Id = offerId });
+        var response = await OffersClient.GetMyOfferAsync(new GetMyOfferRequest { Id = offerId }, cancellationToken: cancellationToken);
         return response.Offer.Adapt<Models.OfferInfo>();
     }
 
-    public async Task<List<Models.OfferInfo>> GetMyOffersAsync(string currencyCode, string direction)
+    public async Task<List<Models.OfferInfo>> GetMyOffersAsync(string currencyCode, string direction, CancellationToken cancellationToken = default)
     {
-        var response = await _offersClient.GetMyOffersAsync(new GetMyOffersRequest() { CurrencyCode = currencyCode, Direction = direction });
+        var response = await OffersClient.GetMyOffersAsync(new GetMyOffersRequest() { CurrencyCode = currencyCode, Direction = direction }, cancellationToken: cancellationToken);
         return response.Offers.Adapt<List<Models.OfferInfo>>();
     }
 
-    public async Task CancelOfferAsync(string offerId)
+    public async Task CancelOfferAsync(string offerId, CancellationToken cancellationToken = default)
     {
-        await _offersClient.CancelOfferAsync(new CancelOfferRequest { Id = offerId });
+        await OffersClient.CancelOfferAsync(new CancelOfferRequest { Id = offerId }, cancellationToken: cancellationToken);
     }
 
-    public async Task<Models.OfferInfo> GetOfferAsync(string offerId)
+    public async Task<Models.OfferInfo> GetOfferAsync(string offerId, CancellationToken cancellationToken = default)
     {
-        var response = await _offersClient.GetOfferAsync(new GetOfferRequest { Id = offerId });
+        var response = await OffersClient.GetOfferAsync(new GetOfferRequest { Id = offerId }, cancellationToken: cancellationToken);
         return response.Offer.Adapt<Models.OfferInfo>();
     }
 
-    public async Task<List<Models.OfferInfo>> GetOffersAsync(string currencyCode, string direction)
+    public async Task<List<Models.OfferInfo>> GetOffersAsync(string currencyCode, string direction, CancellationToken cancellationToken = default)
     {
-        var response = await _offersClient.GetOffersAsync(new GetOffersRequest { CurrencyCode = currencyCode, Direction = direction });
+        var response = await OffersClient.GetOffersAsync(new GetOffersRequest { CurrencyCode = currencyCode, Direction = direction }, cancellationToken: cancellationToken);
         return response.Offers.Adapt<List<Models.OfferInfo>>();
     }
 }

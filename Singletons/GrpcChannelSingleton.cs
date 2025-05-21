@@ -2,13 +2,12 @@
 
 namespace HavenoSharp.Singletons;
 
-
 public sealed class GrpcChannelSingleton
 {
     private string _password = string.Empty;
     private string _host = string.Empty;
 
-    public GrpcChannel Channel { get; private set; } = default!;
+    public GrpcChannel Channel { get; private set; } = GrpcChannel.ForAddress("http://127.0.0.1");
 
     public GrpcChannelSingleton()
     {

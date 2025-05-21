@@ -1,6 +1,6 @@
 ﻿namespace HavenoSharp.Models;
 
-public class TradeStatistics
+public class TradeStatistic
 {
     public string Currency { get; set; } = string.Empty;
     public long Price { get; set; }

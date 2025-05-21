@@ -8,14 +8,11 @@ namespace HavenoSharp.Singletons;
 public sealed class HavenoNotificationSingleton
 {
     private readonly GrpcChannelSingleton _grpcChannelService;
-
     private readonly SemaphoreSlim _semaphore = new(1, 1);
-
-    private NotificationsClient _notificationsClient;
-
     private CancellationTokenSource _cancellationTokenSource;
     private Task? _notificationHandlerTask;
 
+    private NotificationsClient NotificationsClient => new(_grpcChannelService.Channel);
     public TaskCompletionSource<bool> IsInitialized { get; private set; } = new();
 
     public event Action<Models.NotificationMessage>? NotificationMessageReceived;
@@ -23,7 +20,6 @@ public sealed class HavenoNotificationSingleton
     public HavenoNotificationSingleton(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
-        _notificationsClient = new(_grpcChannelService.Channel);
         _cancellationTokenSource = new();
     }
 
@@ -33,7 +29,7 @@ public sealed class HavenoNotificationSingleton
         {
             try
             {
-                var registerResponse = _notificationsClient.RegisterNotificationListener(new RegisterNotificationListenerRequest(), cancellationToken: cancellationToken);
+                var registerResponse = NotificationsClient.RegisterNotificationListener(new RegisterNotificationListenerRequest(), cancellationToken: cancellationToken);
                 if (!IsInitialized.Task.IsCompleted)
                     IsInitialized.SetResult(true);
 

@@ -7,23 +7,22 @@ namespace HavenoSharp.Services;
 
 public interface IHavenoTradeStatisticsService
 {
-    Task<List<Models.TradeStatistics>> GetTradeStatisticsAsync();
+    Task<List<Models.TradeStatistic>> GetTradeStatisticsAsync(CancellationToken cancellationToken = default);
 }
 
 public sealed class HavenoTradeStatisticsService : IHavenoTradeStatisticsService
 {
-    private readonly GetTradeStatisticsClient _getTradeStatisticsClient;
     private readonly GrpcChannelSingleton _grpcChannelService;
+    private GetTradeStatisticsClient GetTradeStatisticsClient => new(_grpcChannelService.Channel);
 
     public HavenoTradeStatisticsService(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
-        _getTradeStatisticsClient = new(_grpcChannelService.Channel);
     }
 
-    public async Task<List<Models.TradeStatistics>> GetTradeStatisticsAsync()
+    public async Task<List<Models.TradeStatistic>> GetTradeStatisticsAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _getTradeStatisticsClient.GetTradeStatisticsAsync(new GetTradeStatisticsRequest());
-        return response.TradeStatistics.Adapt<List<Models.TradeStatistics>>();
+        var response = await GetTradeStatisticsClient.GetTradeStatisticsAsync(new GetTradeStatisticsRequest(), cancellationToken: cancellationToken);
+        return response.TradeStatistics.Adapt<List<Models.TradeStatistic>>();
     }
 }

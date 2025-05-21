@@ -6,23 +6,22 @@ namespace HavenoSharp.Services;
 
 public interface IHavenoXmrNodeService
 {
-    Task<bool> IsXmrNodeOnlineAsync();
+    Task<bool> IsXmrNodeOnlineAsync(CancellationToken cancellationToken = default);
 }
 
 public sealed class HavenoXmrNodeService : IHavenoXmrNodeService
 {
-    private readonly XmrNodeClient _xmrNodeClient;
     private readonly GrpcChannelSingleton _grpcChannelService;
+    private XmrNodeClient XmrNodeClient => new(_grpcChannelService.Channel);
 
     public HavenoXmrNodeService(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
-        _xmrNodeClient = new(_grpcChannelService.Channel);
     }
 
-    public async Task<bool> IsXmrNodeOnlineAsync()
+    public async Task<bool> IsXmrNodeOnlineAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _xmrNodeClient.IsXmrNodeOnlineAsync(new IsXmrNodeOnlineRequest());
+        var response = await XmrNodeClient.IsXmrNodeOnlineAsync(new IsXmrNodeOnlineRequest(), cancellationToken: cancellationToken);
         return response.IsRunning;
     }
 }

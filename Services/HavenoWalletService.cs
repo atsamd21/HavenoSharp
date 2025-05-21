@@ -8,28 +8,27 @@ namespace HavenoSharp.Services;
 
 public interface IHavenoWalletService
 {
-    Task<Models.Balances> GetBalancesAsync();
-    Task<string> RelayXmrTxAsync(string metadata);
-    Task<string> GetXmrPrimaryAddressAsync();
-    Task<CreateXmrTxResponse> CreateXmrTxAsync(Models.Requests.CreateXmrTxRequest createXmrTxRequest);
-    Task<string> GetXmrSeedAsync();
-    Task<List<Models.XmrTx>> GetXmrTxsAsync();
+    Task<Models.Balances> GetBalancesAsync(CancellationToken cancellationToken = default);
+    Task<string> RelayXmrTxAsync(string metadata, CancellationToken cancellationToken = default);
+    Task<string> GetXmrPrimaryAddressAsync(CancellationToken cancellationToken = default);
+    Task<CreateXmrTxResponse> CreateXmrTxAsync(Models.Requests.CreateXmrTxRequest createXmrTxRequest, CancellationToken cancellationToken = default);
+    Task<string> GetXmrSeedAsync(CancellationToken cancellationToken = default);
+    Task<List<Models.XmrTx>> GetXmrTxsAsync(CancellationToken cancellationToken = default);
 }
 
 public sealed class HavenoWalletService : IHavenoWalletService
 {
-    private readonly WalletsClient _walletClient;
     private readonly GrpcChannelSingleton _grpcChannelService;
+    private WalletsClient WalletClient => new(_grpcChannelService.Channel);
 
     public HavenoWalletService(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
-        _walletClient = new(_grpcChannelService.Channel);
     }
 
-    public async Task<Models.Balances> GetBalancesAsync()
+    public async Task<Models.Balances> GetBalancesAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _walletClient.GetBalancesAsync(new GetBalancesRequest());
+        var response = await WalletClient.GetBalancesAsync(new GetBalancesRequest(), cancellationToken: cancellationToken);
         return new Models.Balances
         {
             AvailableXMRBalance = response.Balances.Xmr.AvailableBalance,
@@ -40,36 +39,36 @@ public sealed class HavenoWalletService : IHavenoWalletService
         };
     }
 
-    public async Task<string> RelayXmrTxAsync(string metadata)
+    public async Task<string> RelayXmrTxAsync(string metadata, CancellationToken cancellationToken = default)
     {
-        var response = await _walletClient.relayXmrTxAsync(new RelayXmrTxRequest { Metadata = metadata });
+        var response = await WalletClient.relayXmrTxAsync(new RelayXmrTxRequest { Metadata = metadata }, cancellationToken: cancellationToken);
         return response.Hash;
     }
 
-    public async Task<string> GetXmrPrimaryAddressAsync()
+    public async Task<string> GetXmrPrimaryAddressAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _walletClient.GetXmrPrimaryAddressAsync(new GetXmrPrimaryAddressRequest());
+        var response = await WalletClient.GetXmrPrimaryAddressAsync(new GetXmrPrimaryAddressRequest(), cancellationToken: cancellationToken);
         return response.PrimaryAddress;
     }
 
-    public async Task<string> GetXmrSeedAsync()
+    public async Task<string> GetXmrSeedAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _walletClient.GetXmrSeedAsync(new GetXmrSeedRequest());
+        var response = await WalletClient.GetXmrSeedAsync(new GetXmrSeedRequest(), cancellationToken: cancellationToken);
         return response.Seed;
     }
 
-    public async Task<List<Models.XmrTx>> GetXmrTxsAsync()
+    public async Task<List<Models.XmrTx>> GetXmrTxsAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _walletClient.GetXmrTxsAsync(new GetXmrTxsRequest());
+        var response = await WalletClient.GetXmrTxsAsync(new GetXmrTxsRequest(), cancellationToken: cancellationToken);
         return response.Txs.Adapt<List<Models.XmrTx>>();
     }
 
-    public async Task<CreateXmrTxResponse> CreateXmrTxAsync(Models.Requests.CreateXmrTxRequest createXmrTxRequest)
+    public async Task<CreateXmrTxResponse> CreateXmrTxAsync(Models.Requests.CreateXmrTxRequest createXmrTxRequest, CancellationToken cancellationToken = default)
     {
         var request = new CreateXmrTxRequest();
         request.Destinations.AddRange(createXmrTxRequest.Destinations.Select(x => new XmrDestination { Address = x.Address, Amount = x.Amount.ToString() }));
 
-        var response = await _walletClient.CreateXmrTxAsync(request);
+        var response = await WalletClient.CreateXmrTxAsync(request, cancellationToken: cancellationToken);
 
         return new CreateXmrTxResponse 
         { 

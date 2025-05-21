@@ -6,23 +6,22 @@ namespace HavenoSharp.Services;
 
 public interface IHavenoVersionService
 {
-    Task<string> GetVersionAsync();
+    Task<string> GetVersionAsync(CancellationToken cancellationToken = default);
 }
 
 public sealed class HavenoVersionService : IHavenoVersionService
 {
-    private readonly GetVersionClient _getVersionClient;
     private readonly GrpcChannelSingleton _grpcChannelService;
+    private GetVersionClient GetVersionClient => new(_grpcChannelService.Channel);
 
     public HavenoVersionService(GrpcChannelSingleton grpcChannelService)
     {
         _grpcChannelService = grpcChannelService;
-        _getVersionClient = new(_grpcChannelService.Channel);
     }
 
-    public async Task<string> GetVersionAsync()
+    public async Task<string> GetVersionAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _getVersionClient.GetVersionAsync(new GetVersionRequest());
+        var response = await GetVersionClient.GetVersionAsync(new GetVersionRequest(), cancellationToken: cancellationToken);
         return response.Version;
     }
 }
