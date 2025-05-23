@@ -3,5 +3,5 @@
 public class XmrDestination
 {
     public string Address { get; set; } = string.Empty;
-    public ulong Amount { get; set; }
+    public string Amount { get; set; } = string.Empty;
 }

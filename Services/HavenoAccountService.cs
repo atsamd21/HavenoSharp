@@ -10,6 +10,13 @@ public interface IHavenoAccountService
 {
     Task<Stream> BackupAccountAsync(CancellationToken cancellationToken = default);
     Task RestoreAccountAsync(Stream zipStream, CancellationToken cancellationToken = default);
+    Task<bool> IsAppInitializedAsync(CancellationToken cancellationToken = default);
+    Task<bool> IsAccountOpenAsync(CancellationToken cancellationToken = default);
+    Task DeleteAccountAsync(CancellationToken cancellationToken = default);
+    Task OpenAccountAsync(string password, CancellationToken cancellationToken = default);
+    Task<bool> AccountExistsAsync(CancellationToken cancellationToken = default);
+    Task CreateAccountAsync(string password, CancellationToken cancellationToken = default);
+    Task CloseAccountAsync(CancellationToken cancellationToken = default);
 }
 
 public sealed class HavenoAccountService : IHavenoAccountService
@@ -46,5 +53,43 @@ public sealed class HavenoAccountService : IHavenoAccountService
             ZipBytes = zipBytes, 
             TotalLength = (ulong)zipBytes.Length 
         });
+    }
+
+    public async Task<bool> IsAppInitializedAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await AccountClient.IsAppInitializedAsync(new IsAppInitializedRequest(), cancellationToken: cancellationToken);
+        return response.IsAppInitialized;
+    }
+
+    public async Task<bool> IsAccountOpenAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await AccountClient.IsAccountOpenAsync(new IsAccountOpenRequest(), cancellationToken: cancellationToken);
+        return response.IsAccountOpen;
+    }
+
+    public async Task DeleteAccountAsync(CancellationToken cancellationToken = default)
+    {
+        await AccountClient.DeleteAccountAsync(new DeleteAccountRequest(), cancellationToken: cancellationToken);
+    }
+
+    public async Task OpenAccountAsync(string password, CancellationToken cancellationToken = default)
+    {
+        await AccountClient.OpenAccountAsync(new OpenAccountRequest { Password = password }, cancellationToken: cancellationToken);
+    }
+
+    public async Task<bool> AccountExistsAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await AccountClient.AccountExistsAsync(new AccountExistsRequest(), cancellationToken: cancellationToken);
+        return response.AccountExists;
+    }
+
+    public async Task CreateAccountAsync(string password, CancellationToken cancellationToken = default)
+    {
+        await AccountClient.CreateAccountAsync(new CreateAccountRequest { Password = password }, cancellationToken: cancellationToken);
+    }
+
+    public async Task CloseAccountAsync(CancellationToken cancellationToken = default)
+    {
+        await AccountClient.CloseAccountAsync(new CloseAccountRequest(), cancellationToken: cancellationToken);
     }
 }

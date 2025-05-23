@@ -11,7 +11,7 @@ public interface IHavenoWalletService
     Task<Models.Balances> GetBalancesAsync(CancellationToken cancellationToken = default);
     Task<string> RelayXmrTxAsync(string metadata, CancellationToken cancellationToken = default);
     Task<string> GetXmrPrimaryAddressAsync(CancellationToken cancellationToken = default);
-    Task<CreateXmrTxResponse> CreateXmrTxAsync(Models.Requests.CreateXmrTxRequest createXmrTxRequest, CancellationToken cancellationToken = default);
+    Task<Models.XmrTx> CreateXmrTxAsync(Models.Requests.CreateXmrTxRequest createXmrTxRequest, CancellationToken cancellationToken = default);
     Task<string> GetXmrSeedAsync(CancellationToken cancellationToken = default);
     Task<List<Models.XmrTx>> GetXmrTxsAsync(CancellationToken cancellationToken = default);
 }
@@ -63,41 +63,12 @@ public sealed class HavenoWalletService : IHavenoWalletService
         return response.Txs.Adapt<List<Models.XmrTx>>();
     }
 
-    public async Task<CreateXmrTxResponse> CreateXmrTxAsync(Models.Requests.CreateXmrTxRequest createXmrTxRequest, CancellationToken cancellationToken = default)
+    public async Task<Models.XmrTx> CreateXmrTxAsync(Models.Requests.CreateXmrTxRequest createXmrTxRequest, CancellationToken cancellationToken = default)
     {
         var request = new CreateXmrTxRequest();
         request.Destinations.AddRange(createXmrTxRequest.Destinations.Select(x => new XmrDestination { Address = x.Address, Amount = x.Amount.ToString() }));
 
         var response = await WalletClient.CreateXmrTxAsync(request, cancellationToken: cancellationToken);
-
-        return new CreateXmrTxResponse 
-        { 
-            Fee = response.Tx.Fee,
-            Hash = response.Tx.Hash,
-            Height = response.Tx.Height,
-            IsConfirmed = response.Tx.IsConfirmed,
-            IsLocked = response.Tx.IsLocked,
-            Metadata = response.Tx.Metadata,
-            Timestamp = response.Tx.Timestamp,
-            IncomingTransfers = response.Tx.IncomingTransfers.Select(x => new Models.XmrIncomingTransfer
-            {
-                AccountIndex = x.AccountIndex,
-                Address = x.Address,
-                Amount = x.Amount,
-                NumSuggestedConfirmations = x.NumSuggestedConfirmations,
-                SubaddressIndex = x.SubaddressIndex
-            }).ToList(),
-            OutgoingTransfer = new Models.XmrOutgoingTransfer 
-            {
-                AccountIndex = response.Tx.OutgoingTransfer.AccountIndex,
-                Amount = response.Tx.OutgoingTransfer.Amount,
-                SubaddressIndices = response.Tx.OutgoingTransfer.SubaddressIndices.ToList(),
-                Destinations = response.Tx.OutgoingTransfer.Destinations.Select(x => new Models.XmrDestination 
-                { 
-                    Address = x.Address, 
-                    Amount = ulong.Parse(x.Amount) 
-                }).ToList()
-            }
-        };
+        return response.Tx.Adapt<Models.XmrTx>();
     }
 }
