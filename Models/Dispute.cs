@@ -22,7 +22,7 @@ public class Dispute
     public PaymentAccountPayload TakerPaymentAccountPayload { get; set; } = new();
     public PubKeyRing AgentPubKeyRing { get; set; } = new();
     public bool IsSupportTicket { get; set; }
-    public List<ChatMessage> ChatMessages { get; set; } = [];
+    public List<ChatMessage> ChatMessage { get; set; } = [];
     public bool IsClosed { get; set; }
     public DisputeResult DisputeResult { get; set; } = new();
     public string DisputePayoutTxId { get; set; } = string.Empty;

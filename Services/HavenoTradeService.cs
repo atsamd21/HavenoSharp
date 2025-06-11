@@ -21,7 +21,7 @@ public interface IHavenoTradeService
 public sealed class HavenoTradeService : IHavenoTradeService
 {
     private readonly GrpcChannelSingleton _grpcChannelService;
-    private TradesClient AccountClient => new(_grpcChannelService.Channel);
+    private TradesClient TradesClient => new(_grpcChannelService.Channel);
 
     public HavenoTradeService(GrpcChannelSingleton grpcChannelService)
     {
@@ -30,7 +30,7 @@ public sealed class HavenoTradeService : IHavenoTradeService
 
     public async Task<TakeOfferResponse> TakeOfferAsync(Models.Requests.TakeOfferRequest takeOfferRequest, CancellationToken cancellationToken = default)
     {
-        var response = await AccountClient.TakeOfferAsync(new TakeOfferRequest 
+        var response = await TradesClient.TakeOfferAsync(new TakeOfferRequest 
         { 
             Amount = takeOfferRequest.Amount,
             PaymentAccountId = takeOfferRequest.PaymentAccountId,
@@ -43,39 +43,39 @@ public sealed class HavenoTradeService : IHavenoTradeService
 
     public async Task SendChatMessageAsync(string tradeId, string message, CancellationToken cancellationToken = default)
     {
-        await AccountClient.SendChatMessageAsync(new SendChatMessageRequest { TradeId = tradeId, Message = message }, cancellationToken: cancellationToken);
+        await TradesClient.SendChatMessageAsync(new SendChatMessageRequest { TradeId = tradeId, Message = message }, cancellationToken: cancellationToken);
     }
 
     public async Task<List<Models.ChatMessage>> GetChatMessagesAsync(string tradeId, CancellationToken cancellationToken = default)
     {
-        var response = await AccountClient.GetChatMessagesAsync(new GetChatMessagesRequest { TradeId = tradeId }, cancellationToken: cancellationToken);
+        var response = await TradesClient.GetChatMessagesAsync(new GetChatMessagesRequest { TradeId = tradeId }, cancellationToken: cancellationToken);
         return response.Message.Adapt<List<Models.ChatMessage>>();
     }
 
     public async Task<Models.TradeInfo> GetTradeAsync(string tradeId, CancellationToken cancellationToken = default)
     {
-        var response = await AccountClient.GetTradeAsync(new GetTradeRequest { TradeId = tradeId }, cancellationToken: cancellationToken);
+        var response = await TradesClient.GetTradeAsync(new GetTradeRequest { TradeId = tradeId }, cancellationToken: cancellationToken);
         return response.Trade.Adapt<Models.TradeInfo>();
     }
 
     public async Task<List<Models.TradeInfo>> GetTradesAsync(Models.Category category, CancellationToken cancellationToken = default)
     {
-        var response = await AccountClient.GetTradesAsync(new GetTradesRequest { Category = (GetTradesRequest.Types.Category)category }, cancellationToken: cancellationToken);
+        var response = await TradesClient.GetTradesAsync(new GetTradesRequest { Category = (GetTradesRequest.Types.Category)category }, cancellationToken: cancellationToken);
         return response.Trades.Adapt<List<Models.TradeInfo>>();
     }
 
     public async Task CompleteTradeAsync(string tradeId, CancellationToken cancellationToken = default)
     {
-        await AccountClient.CompleteTradeAsync(new CompleteTradeRequest { TradeId = tradeId }, cancellationToken: cancellationToken);
+        await TradesClient.CompleteTradeAsync(new CompleteTradeRequest { TradeId = tradeId }, cancellationToken: cancellationToken);
     }
 
     public async Task ConfirmPaymentReceivedAsync(string tradeId, CancellationToken cancellationToken = default)
     {
-        await AccountClient.ConfirmPaymentReceivedAsync(new ConfirmPaymentReceivedRequest { TradeId = tradeId }, cancellationToken: cancellationToken);
+        await TradesClient.ConfirmPaymentReceivedAsync(new ConfirmPaymentReceivedRequest { TradeId = tradeId }, cancellationToken: cancellationToken);
     }
 
     public async Task ConfirmPaymentSentAsync(string tradeId, CancellationToken cancellationToken = default)
     {
-       await AccountClient.ConfirmPaymentSentAsync(new ConfirmPaymentSentRequest { TradeId = tradeId }, cancellationToken: cancellationToken);
+       await TradesClient.ConfirmPaymentSentAsync(new ConfirmPaymentSentRequest { TradeId = tradeId }, cancellationToken: cancellationToken);
     }
 }
