@@ -10,10 +10,12 @@ namespace HavenoSharp.Services;
 public interface IHavenoXmrNodeService
 {
     Task<bool> IsXmrNodeOnlineAsync(CancellationToken cancellationToken = default);
-    Task SetMoneroNodeAsync(string url, string username, string password, CancellationToken cancellationToken = default);
+    Task SetMoneroNodeAsync(string url, string username, string password, int priority, CancellationToken cancellationToken = default);
     Task<Models.UrlConnection> GetMoneroNodeAsync(CancellationToken cancellationToken = default);
     Task<Models.UrlConnection> CheckConnectionAsync(CancellationToken cancellationToken = default);
     Task<List<Models.UrlConnection>> GetConnectionsAsync(CancellationToken cancellationToken = default);
+    Task RemoveConnectionAsync(string url, CancellationToken cancellationToken = default);
+    Task SetAutoSwitchAsync(bool autoSwitch, CancellationToken cancellationToken = default);
 }
 
 public sealed class HavenoXmrNodeService : IHavenoXmrNodeService
@@ -33,14 +35,14 @@ public sealed class HavenoXmrNodeService : IHavenoXmrNodeService
         return response.IsRunning;
     }
 
-    public async Task SetMoneroNodeAsync(string url, string username, string password, CancellationToken cancellationToken = default)
+    public async Task SetMoneroNodeAsync(string url, string username, string password, int priority, CancellationToken cancellationToken = default)
     {
         await XmrConnections.SetConnectionAsync(new SetConnectionRequest
         {
             Url = url,
             Connection = new UrlConnection
             {
-                Priority = 1,
+                Priority = priority,
                 Url = url,
                 Username = username,
                 Password = password
@@ -64,5 +66,15 @@ public sealed class HavenoXmrNodeService : IHavenoXmrNodeService
     {
         var response = await XmrConnections.GetConnectionsAsync(new GetConnectionsRequest(), cancellationToken: cancellationToken);
         return response.Connections.Adapt<List<Models.UrlConnection>>();
+    }
+
+    public async Task RemoveConnectionAsync(string url, CancellationToken cancellationToken = default)
+    {
+        await XmrConnections.RemoveConnectionAsync(new RemoveConnectionRequest() { Url = url }, cancellationToken: cancellationToken);
+    }
+
+    public async Task SetAutoSwitchAsync(bool autoSwitch, CancellationToken cancellationToken = default)
+    {
+        await XmrConnections.SetAutoSwitchAsync(new SetAutoSwitchRequest { AutoSwitch = autoSwitch }, cancellationToken: cancellationToken);
     }
 }
