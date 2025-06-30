@@ -29,7 +29,7 @@ public sealed class HavenoNotificationSingleton
         {
             try
             {
-                var registerResponse = NotificationsClient.RegisterNotificationListener(new RegisterNotificationListenerRequest(), cancellationToken: cancellationToken);
+                using var registerResponse = NotificationsClient.RegisterNotificationListener(new RegisterNotificationListenerRequest(), cancellationToken: cancellationToken);
                 if (!IsInitialized.Task.IsCompleted)
                     IsInitialized.SetResult(true);
 
@@ -98,11 +98,11 @@ public sealed class HavenoNotificationSingleton
             if (cancellationToken != default)
             {
                 var linkedCancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, _cancellationTokenSource.Token);
-                _notificationHandlerTask = NotificationHandler(linkedCancellationTokenSource.Token);
+                _notificationHandlerTask = Task.Factory.StartNew(() => NotificationHandler(linkedCancellationTokenSource.Token), TaskCreationOptions.LongRunning);
             }
             else
             {
-                _notificationHandlerTask = NotificationHandler(_cancellationTokenSource.Token);
+                _notificationHandlerTask = Task.Factory.StartNew(() => NotificationHandler(_cancellationTokenSource.Token), TaskCreationOptions.LongRunning);
             }
         }
         finally
