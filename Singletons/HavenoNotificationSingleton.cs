@@ -18,7 +18,7 @@ public sealed class HavenoNotificationSingleton
     private readonly SemaphoreSlim _semaphore = new(1, 1);
     private CancellationTokenSource _cancellationTokenSource;
     private Task? _notificationHandlerTask;
-    private DateTime _lastMessageTime = new();
+    private DateTime _lastMessageTime;
 
     private NotificationsClient NotificationsClient => new(_grpcChannelService.Channel);
     public TaskCompletionSource<bool> IsInitialized { get; private set; } = new();
@@ -31,11 +31,12 @@ public sealed class HavenoNotificationSingleton
         _grpcChannelService = grpcChannelService;
         _serviceProvider = serviceProvider;
         _cancellationTokenSource = new();
+        _lastMessageTime = DateTime.UtcNow;
     }
 
-    public async Task StopNotificationListener()
+    public async Task StopNotificationListenerAsync()
     {
-        if (!await _semaphore.WaitAsync(0, CancellationToken.None))
+        if (!_semaphore.Wait(0, CancellationToken.None))
         {
             return;
         }
@@ -59,12 +60,15 @@ public sealed class HavenoNotificationSingleton
         }
     }
 
-    public async Task StartAsync(CancellationToken cancellationToken)
+    public void Start(CancellationToken cancellationToken)
     {
-        // Poll once to get inital
-        await PollAsync(cancellationToken);
-        // Switch to the notification listenter
-        await RegisterNotificationListenerAsync(cancellationToken);
+        _ = Task.Run(async () =>
+        {
+            // Poll once to get inital
+            await PollAsync(cancellationToken);
+            // Switch to the notification listenter
+            await RegisterNotificationListenerAsync(cancellationToken);
+        }, cancellationToken);
     }
 
     public async Task PollAsync(CancellationToken cancellationToken)
@@ -108,7 +112,7 @@ public sealed class HavenoNotificationSingleton
                     if (chatMessages is null)
                         continue;
 
-                    foreach (var message in chatMessages.Where(x => x.Date.ToDateTime() > _lastMessageTime).ToList())
+                    foreach (var message in chatMessages.Where(x => x.Date.ToDateTime() > _lastMessageTime).OrderBy(x => x.Date).ToList())
                     {
                         if (cancellationToken.IsCancellationRequested)
                             return;
@@ -119,7 +123,13 @@ public sealed class HavenoNotificationSingleton
 
                         _lastMessageTime = message.Date.ToDateTime();
 
-                        NotificationMessageReceived?.Invoke(message.Adapt<Models.NotificationMessage>());
+                        var notificationMessage = new Models.NotificationMessage()
+                        {
+                            ChatMessage = message,
+                            Type = NotificationType.ChatMessage,
+                        };
+
+                        NotificationMessageReceived?.Invoke(notificationMessage);
                     }
                 }
 
@@ -129,9 +139,18 @@ public sealed class HavenoNotificationSingleton
             {
                 return;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine(e);
 
+                try
+                {
+                    await Task.Delay(5_000, cancellationToken);
+                }
+                catch (TaskCanceledException)
+                {
+                    return;
+                }
             }
         }
 
@@ -165,6 +184,13 @@ public sealed class HavenoNotificationSingleton
                         {
                             Reset();
                             return;
+                        }
+
+                        if (message.Type == Haveno.Proto.Grpc.NotificationMessage.Types.NotificationType.ChatMessage)
+                        {
+                            var date = message.ChatMessage.Date.ToDateTime();
+                            if (date > _lastMessageTime)
+                                _lastMessageTime = date;
                         }
 
                         NotificationMessageReceived?.Invoke(message.Adapt<Models.NotificationMessage>());
@@ -210,9 +236,9 @@ public sealed class HavenoNotificationSingleton
 
     public async Task RegisterNotificationListenerAsync(CancellationToken cancellationToken = default)
     {
-        if (!await _semaphore.WaitAsync(0, CancellationToken.None))
+        if (!_semaphore.Wait(0, CancellationToken.None))
         {
-            return; 
+            return;
         }
 
         try
