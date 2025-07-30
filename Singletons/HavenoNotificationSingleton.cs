@@ -103,9 +103,8 @@ public sealed class HavenoNotificationSingleton
                     {
                         chatMessages = await tradeService.GetChatMessagesAsync(trade.TradeId, cancellationToken);
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
-                        Console.WriteLine(e);
                         continue;
                     }
 
@@ -139,10 +138,8 @@ public sealed class HavenoNotificationSingleton
             {
                 return;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                Console.WriteLine(e);
-
                 try
                 {
                     await Task.Delay(5_000, cancellationToken);
