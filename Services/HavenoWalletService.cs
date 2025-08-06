@@ -1,5 +1,4 @@
 ﻿using Haveno.Proto.Grpc;
-using HavenoSharp.Models.Responses;
 using HavenoSharp.Singletons;
 using Mapster;
 using static Haveno.Proto.Grpc.Wallets;
@@ -9,11 +8,12 @@ namespace HavenoSharp.Services;
 public interface IHavenoWalletService
 {
     Task<Models.Balances> GetBalancesAsync(CancellationToken cancellationToken = default);
-    Task<string> RelayXmrTxAsync(string metadata, CancellationToken cancellationToken = default);
+    Task<List<string>> RelayXmrTxsAsync(List<string> metadatas, CancellationToken cancellationToken = default);
     Task<string> GetXmrPrimaryAddressAsync(CancellationToken cancellationToken = default);
     Task<Models.XmrTx> CreateXmrTxAsync(Models.Requests.CreateXmrTxRequest createXmrTxRequest, CancellationToken cancellationToken = default);
     Task<string> GetXmrSeedAsync(CancellationToken cancellationToken = default);
     Task<List<Models.XmrTx>> GetXmrTxsAsync(CancellationToken cancellationToken = default);
+    Task<List<Models.XmrTx>> CreateXmrSweepTxsAsync(string address, CancellationToken cancellationToken = default);
 }
 
 public sealed class HavenoWalletService : IHavenoWalletService
@@ -39,10 +39,19 @@ public sealed class HavenoWalletService : IHavenoWalletService
         };
     }
 
-    public async Task<string> RelayXmrTxAsync(string metadata, CancellationToken cancellationToken = default)
+    public async Task<List<string>> RelayXmrTxsAsync(List<string> metadatas, CancellationToken cancellationToken = default)
     {
-        var response = await WalletClient.relayXmrTxAsync(new RelayXmrTxRequest { Metadata = metadata }, cancellationToken: cancellationToken);
-        return response.Hash;
+        var request = new RelayXmrTxsRequest();
+        request.Metadatas.AddRange(metadatas);
+
+        var response = await WalletClient.RelayXmrTxsAsync(request, cancellationToken: cancellationToken);
+        return [.. response.Hashes];
+    }
+
+    public async Task<List<Models.XmrTx>> CreateXmrSweepTxsAsync(string address, CancellationToken cancellationToken = default)
+    {
+        var response = await WalletClient.CreateXmrSweepTxsAsync(new CreateXmrSweepTxsRequest { Address = address }, cancellationToken: cancellationToken);
+        return response.Txs.Adapt<List<Models.XmrTx>>();
     }
 
     public async Task<string> GetXmrPrimaryAddressAsync(CancellationToken cancellationToken = default)
