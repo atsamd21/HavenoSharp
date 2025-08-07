@@ -10,7 +10,7 @@
     <DebugSymbols>false</DebugSymbols>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>HavenoSharp</PackageId>
-    <Version>1.1.0</Version>
+    <Version>1.1.1</Version>
     <Authors>Atsamd21</Authors>
     <Description>Library for the Haveno daemon</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

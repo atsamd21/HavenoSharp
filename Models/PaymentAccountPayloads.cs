@@ -228,7 +228,7 @@ public class FasterPaymentsAccountPayload
 
 public class InteracETransferAccountPayload
 {
-    public string Email { get; set; } = string.Empty;
+    public string EmailOrMobileNr { get; set; } = string.Empty;
     public string HolderName { get; set; } = string.Empty;
     public string Question { get; set; } = string.Empty;
     public string Answer { get; set; } = string.Empty;
@@ -357,7 +357,7 @@ public class TransferwiseUsdAccountPayload
 {
     public string Email { get; set; } = string.Empty;
     public string HolderName { get; set; } = string.Empty;
-    public string BeneficiaryAddress { get; set; } = string.Empty;
+    public string HolderAddress { get; set; } = string.Empty;
 }
 
 public class PayseraAccountPayload

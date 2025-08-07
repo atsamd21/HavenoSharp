@@ -41,4 +41,7 @@ public class TradeInfo
     public string MakerDepositTxId { get; set; } = string.Empty;
     public string TakerDepositTxId { get; set; } = string.Empty;
     public string PayoutTxId { get; set; } = string.Empty;
+    public string StartTime { get; set; } = string.Empty;
+    public string MaxDurationMs { get; set; } = string.Empty;
+    public string DeadlineTime { get; set; } = string.Empty;
 }
