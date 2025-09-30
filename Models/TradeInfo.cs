@@ -29,11 +29,13 @@ public class TradeInfo
     public bool IsDepositsPublished { get; set; }
     public bool IsDepositsConfirmed { get; set; }
     public bool IsDepositsUnlocked { get; set; }
+    public bool IsDepositsFinalized { get; set; }
     public bool IsPaymentSent { get; set; }
     public bool IsPaymentReceived { get; set; }
     public bool IsPayoutPublished { get; set; }
     public bool IsPayoutConfirmed { get; set; }
     public bool IsPayoutUnlocked { get; set; }
+    public bool IsPayoutFinalized { get; set; }
     public bool IsCompleted { get; set; }
     public string ContractAsJson { get; set; } = string.Empty;
     public ContractInfo Contract { get; set; } = new();
