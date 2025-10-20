@@ -183,14 +183,22 @@ public sealed class HavenoNotificationSingleton
                             return;
                         }
 
+                        var notificationMessage = message.Adapt<Models.NotificationMessage>();
+
                         if (message.Type == Haveno.Proto.Grpc.NotificationMessage.Types.NotificationType.ChatMessage)
                         {
                             var date = message.ChatMessage.Date.ToDateTime();
                             if (date > _lastMessageTime)
                                 _lastMessageTime = date;
                         }
+                        else if (message.Type == Haveno.Proto.Grpc.NotificationMessage.Types.NotificationType.TradeUpdate)
+                        {
+                            var trade = notificationMessage.Trade;
 
-                        NotificationMessageReceived?.Invoke(message.Adapt<Models.NotificationMessage>());
+                            TradeInfos.AddOrUpdate(trade.TradeId, trade, (key, old) => trade);
+                        }
+
+                        NotificationMessageReceived?.Invoke(notificationMessage);
                     }
                 }
 
