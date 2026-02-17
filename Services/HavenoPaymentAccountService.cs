@@ -90,7 +90,19 @@ public sealed class HavenoPaymentAccountService : IHavenoPaymentAccountService
     {
         try
         {
-            await PaymentAccountsClient.ValidateFormFieldAsync(validateFormFieldRequest.Adapt<ValidateFormFieldRequest>(), cancellationToken: cancellationToken);
+            ValidateFormFieldRequest request = new()
+            {
+                Value = validateFormFieldRequest.Value,
+                FieldId = validateFormFieldRequest.FieldId.Adapt<Protobuf.PaymentAccountFormField.Types.FieldId>(),
+                Form = new Protobuf.PaymentAccountForm
+                {
+                    Id = validateFormFieldRequest.Form.Id.Adapt<Protobuf.PaymentAccountForm.Types.FormId>()
+                }
+            };
+
+            request.Form.Fields.AddRange(validateFormFieldRequest.Form.Fields.Select(x => x.Adapt<Protobuf.PaymentAccountFormField>()));
+
+            await PaymentAccountsClient.ValidateFormFieldAsync(request, cancellationToken: cancellationToken);
             return string.Empty;
         }
         catch (RpcException e)
