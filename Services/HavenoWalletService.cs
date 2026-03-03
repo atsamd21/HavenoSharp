@@ -1,4 +1,5 @@
 ﻿using Haveno.Proto.Grpc;
+using HavenoSharp.Models.Responses;
 using HavenoSharp.Singletons;
 using Mapster;
 using static Haveno.Proto.Grpc.Wallets;
@@ -14,6 +15,7 @@ public interface IHavenoWalletService
     Task<string> GetXmrSeedAsync(CancellationToken cancellationToken = default);
     Task<List<Models.XmrTx>> GetXmrTxsAsync(CancellationToken cancellationToken = default);
     Task<List<Models.XmrTx>> CreateXmrSweepTxsAsync(string address, CancellationToken cancellationToken = default);
+    Task<GetWalletHeightResponse> GetHeightAsync(CancellationToken cancellationToken = default);
 }
 
 public sealed class HavenoWalletService : IHavenoWalletService
@@ -79,5 +81,11 @@ public sealed class HavenoWalletService : IHavenoWalletService
 
         var response = await WalletClient.CreateXmrTxAsync(request, cancellationToken: cancellationToken);
         return response.Tx.Adapt<Models.XmrTx>();
+    }
+
+    public async Task<GetWalletHeightResponse> GetHeightAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await WalletClient.GetHeightAsync(new GetWalletHeightRequest(), cancellationToken: cancellationToken);
+        return response.Adapt<GetWalletHeightResponse>();
     }
 }
