@@ -42,4 +42,7 @@ public class OfferInfo
     public bool IsPrivateOffer { get; set; }
     public string Challenge { get; set; } = string.Empty;   
     public string ExtraInfo { get; set; } = string.Empty;
+    public List<string> AcceptedCountryCodes { get; set; } = [];
+    public string AcceptedCountriesString { get; set; } = string.Empty;
+    public string City { get; set; } = string.Empty;
 }
