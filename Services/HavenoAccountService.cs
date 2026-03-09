@@ -2,6 +2,7 @@
 using Grpc.Core;
 using Haveno.Proto.Grpc;
 using HavenoSharp.Singletons;
+using System.IO;
 using static Haveno.Proto.Grpc.Account;
 
 namespace HavenoSharp.Services;
@@ -40,6 +41,30 @@ public sealed class HavenoAccountService : IHavenoAccountService
         }
 
         return memoryStream;
+    }
+
+    public async Task<Stream> BackupAccount2Async(CancellationToken cancellationToken = default)
+    {
+        using var backupStreamingCall = AccountClient.BackupAccount(new BackupAccountRequest(), cancellationToken: cancellationToken);
+        var memoryStream = new MemoryStream();
+
+        await foreach (var message in backupStreamingCall.ResponseStream.ReadAllAsync(cancellationToken))
+        {
+            await memoryStream.WriteAsync(message.ZipBytes.Memory, cancellationToken);
+        }
+
+        return memoryStream;
+    }
+
+    public async Task TaskBackupAccountToFileAsync(string path, CancellationToken cancellationToken = default)
+    {
+        using var backupStreamingCall = AccountClient.BackupAccount(new BackupAccountRequest(), cancellationToken: cancellationToken);
+        using var fileStream = File.Open(path, FileMode.Create);
+
+        await foreach (var message in backupStreamingCall.ResponseStream.ReadAllAsync(cancellationToken))
+        {
+            await fileStream.WriteAsync(message.ZipBytes.Memory, cancellationToken);
+        }
     }
 
     public async Task RestoreAccountAsync(Stream zipStream, CancellationToken cancellationToken = default)
