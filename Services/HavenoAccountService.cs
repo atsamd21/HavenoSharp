@@ -56,7 +56,7 @@ public sealed class HavenoAccountService : IHavenoAccountService
         return memoryStream;
     }
 
-    public async Task TaskBackupAccountToFileAsync(string path, CancellationToken cancellationToken = default)
+    public async Task BackupAccountToFileAsync(string path, CancellationToken cancellationToken = default)
     {
         using var backupStreamingCall = AccountClient.BackupAccount(new BackupAccountRequest(), cancellationToken: cancellationToken);
         using var fileStream = File.Open(path, FileMode.Create);
