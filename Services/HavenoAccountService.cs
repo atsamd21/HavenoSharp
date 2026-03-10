@@ -10,6 +10,8 @@ namespace HavenoSharp.Services;
 public interface IHavenoAccountService
 {
     Task<Stream> BackupAccountAsync(CancellationToken cancellationToken = default);
+    Task<Stream> BackupAccount2Async(CancellationToken cancellationToken = default);
+    Task BackupAccountToFileAsync(string path, CancellationToken cancellationToken = default);
     Task RestoreAccountAsync(Stream zipStream, CancellationToken cancellationToken = default);
     Task<bool> IsAppInitializedAsync(CancellationToken cancellationToken = default);
     Task<bool> IsAccountOpenAsync(CancellationToken cancellationToken = default);
