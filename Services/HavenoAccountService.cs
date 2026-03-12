@@ -37,7 +37,7 @@ public sealed class HavenoAccountService : IHavenoAccountService
         using var backupStreamingCall = AccountClient.BackupAccount(new BackupAccountRequest(), cancellationToken: cancellationToken);
         var memoryStream = new MemoryStream();
 
-        while (await backupStreamingCall.ResponseStream.MoveNext())
+        while (await backupStreamingCall.ResponseStream.MoveNext(cancellationToken))
         {
             memoryStream.Write(backupStreamingCall.ResponseStream.Current.ZipBytes.Memory.Span);
         }
@@ -71,15 +71,26 @@ public sealed class HavenoAccountService : IHavenoAccountService
 
     public async Task RestoreAccountAsync(Stream zipStream, CancellationToken cancellationToken = default)
     {
-        var zipBytes = await ByteString.FromStreamAsync(zipStream, cancellationToken: cancellationToken);
+        byte[] bytes = new byte[4 * 1024 * 1024 - 4096];
 
-        await AccountClient.RestoreAccountAsync(new RestoreAccountRequest 
-        { 
-            Offset = 0, 
-            HasMore = false, 
-            ZipBytes = zipBytes, 
-            TotalLength = (ulong)zipBytes.Length 
-        });
+        ulong totalBytesRead = 0;
+        int bytesRead;
+        while ((bytesRead = await zipStream.ReadAsync(bytes, cancellationToken)) != 0)
+        {
+            byte[] trimmedBytes = bytes.AsSpan(0, bytesRead).ToArray();
+
+            await AccountClient.RestoreAccountAsync(
+                new RestoreAccountRequest
+                {
+                    Offset = totalBytesRead,
+                    HasMore = zipStream.Position != zipStream.Length,
+                    ZipBytes = ByteString.CopyFrom(trimmedBytes),
+                    TotalLength = (ulong)zipStream.Length
+                },
+                cancellationToken: cancellationToken);
+
+            totalBytesRead += (ulong)bytesRead;
+        }
     }
 
     public async Task<bool> IsAppInitializedAsync(CancellationToken cancellationToken = default)

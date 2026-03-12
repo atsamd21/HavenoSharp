@@ -32,6 +32,7 @@ public sealed class GrpcChannelSingleton
         {
             HttpClient = httpClient,
             MaxReceiveMessageSize = null,
+            MaxSendMessageSize = null,
             DisposeHttpClient = true
         };
 
