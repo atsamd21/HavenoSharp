@@ -6,7 +6,7 @@ namespace HavenoSharp.Services;
 
 public interface IHavenoServerService
 {
-    Task IsXmrNodeOnlineAsync(CancellationToken cancellationToken = default);
+    Task StopAsync(CancellationToken cancellationToken = default);
 }
 
 public sealed class HavenoServerService : IHavenoServerService
@@ -19,7 +19,7 @@ public sealed class HavenoServerService : IHavenoServerService
         _grpcChannelService = grpcChannelService;
     }
 
-    public async Task IsXmrNodeOnlineAsync(CancellationToken cancellationToken = default)
+    public async Task StopAsync(CancellationToken cancellationToken = default)
     {
         await ShutdownServerClient.StopAsync(new StopRequest(), cancellationToken: cancellationToken);
     }
