@@ -16,6 +16,8 @@ public interface IHavenoXmrNodeService
     Task<List<Models.UrlConnection>> GetConnectionsAsync(CancellationToken cancellationToken = default);
     Task RemoveConnectionAsync(string url, CancellationToken cancellationToken = default);
     Task SetAutoSwitchAsync(bool autoSwitch, CancellationToken cancellationToken = default);
+    Task<bool> GetAutoSwitchAsync(CancellationToken cancellationToken = default);
+    Task<Models.UrlConnection> GetBestConnectionAsync(CancellationToken cancellationToken = default);
 }
 
 public sealed class HavenoXmrNodeService : IHavenoXmrNodeService
@@ -33,6 +35,18 @@ public sealed class HavenoXmrNodeService : IHavenoXmrNodeService
     {
         var response = await XmrNodeClient.IsXmrNodeOnlineAsync(new IsXmrNodeOnlineRequest(), cancellationToken: cancellationToken);
         return response.IsRunning;
+    }
+
+    public async Task<Models.UrlConnection> GetBestConnectionAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await XmrConnections.GetBestConnectionAsync(new GetBestConnectionRequest(), cancellationToken: cancellationToken);
+        return response.Connection.Adapt<Models.UrlConnection>();
+    }
+
+    public async Task<bool> GetAutoSwitchAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await XmrConnections.GetAutoSwitchAsync(new GetAutoSwitchRequest(), cancellationToken: cancellationToken);
+        return response.AutoSwitch;
     }
 
     public async Task SetMoneroNodeAsync(string url, string username, string password, int priority, CancellationToken cancellationToken = default)
