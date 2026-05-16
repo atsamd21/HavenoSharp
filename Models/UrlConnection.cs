@@ -19,4 +19,5 @@ public class UrlConnection
     public string Url { get; set; } = string.Empty;
     public OnlineStatus OnlineStatus { get; set; }
     public AuthenticationStatus AuthenticationStatus { get; set; }
+    public int Priority { get; set; }
 }
