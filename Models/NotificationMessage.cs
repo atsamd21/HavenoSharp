@@ -9,4 +9,5 @@ public class NotificationMessage
     public string Message { get; set; } = string.Empty;
     public TradeInfo Trade { get; set; } = new();
     public ChatMessage ChatMessage { get; set; } = new();
+    public Alert Alert { get; set; } = new();
 }

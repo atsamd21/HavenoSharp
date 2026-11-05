@@ -34,6 +34,24 @@ public sealed class HavenoNotificationSingleton
         _lastMessageTime = DateTime.UtcNow;
     }
 
+    public async Task<Alert> GetAlertAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await NotificationsClient.GetAlertAsync(
+            new GetAlertRequest(), 
+            cancellationToken: cancellationToken);
+
+        return new Alert
+        {
+            SignatureAsBase64 = response.Alert.SignatureAsBase64,
+            ExtraData = response.Alert.ExtraData.ToDictionary(),
+            IsPreReleaseInfo = response.Alert.IsPreReleaseInfo,
+            IsUpdateInfo = response.Alert.IsUpdateInfo,
+            Message = response.Alert.Message,
+            OwnerPubKeyBytes = [.. response.Alert.OwnerPubKeyBytes],
+            Version = response.Alert.Version
+        };
+    }
+
     public async Task StopNotificationListenerAsync()
     {
         if (!_semaphore.Wait(0, CancellationToken.None))
