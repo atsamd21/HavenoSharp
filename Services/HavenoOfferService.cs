@@ -15,6 +15,7 @@ public interface IHavenoOfferService
     Task<List<Models.OfferInfo>> GetOffersAsync(string currencyCode, string direction, CancellationToken cancellationToken = default);
     Task ActivateOffer(string offerId, CancellationToken cancellationToken = default);
     Task DeactivateOffer(string offerId, CancellationToken cancellationToken = default);
+    Task<Models.OfferInfo> EditOffer(Models.Requests.EditOfferRequest editOfferRequest, CancellationToken cancellationToken = default);
 }
 
 public sealed class HavenoOfferService : IHavenoOfferService
@@ -80,5 +81,24 @@ public sealed class HavenoOfferService : IHavenoOfferService
                 OfferId = offerId
             },
             cancellationToken: cancellationToken);
+    }
+
+    public async Task<Models.OfferInfo> EditOffer(Models.Requests.EditOfferRequest editOfferRequest, CancellationToken cancellationToken = default)
+    {
+        var response = await OffersClient.EditOfferAsync(
+            new EditOfferRequest 
+            {
+                PaymentAccountId = editOfferRequest.PaymentAccountId,
+                CurrencyCode = editOfferRequest.CurrencyCode,
+                ExtraInfo = editOfferRequest.ExtraInfo,
+                MarketPriceMarginPct = editOfferRequest.MarketPriceMarginPct,
+                OfferId = editOfferRequest.OfferId,
+                Price = editOfferRequest.Price,
+                TriggerPrice = editOfferRequest.TriggerPrice,
+                UseMarketBasedPrice = editOfferRequest.UseMarketBasedPrice
+            },
+            cancellationToken: cancellationToken);
+
+        return response.Offer.Adapt<Models.OfferInfo>();
     }
 }
