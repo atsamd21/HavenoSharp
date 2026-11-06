@@ -5,12 +5,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>preview</LangVersion>
-    <CoreCompileDependsOn>$(CoreCompileDependsOn);Protobuf_Compile</CoreCompileDependsOn>
+    <!--<CoreCompileDependsOn>$(CoreCompileDependsOn);Protobuf_Compile</CoreCompileDependsOn>-->
     <DebugType>None</DebugType>
     <DebugSymbols>false</DebugSymbols>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>HavenoSharp</PackageId>
-    <Version>1.1.16</Version>
+    <Version>1.1.17</Version>
     <Authors>Atsamd21</Authors>
     <Description>Library for the Haveno daemon</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
